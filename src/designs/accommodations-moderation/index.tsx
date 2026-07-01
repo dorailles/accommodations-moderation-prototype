@@ -833,7 +833,14 @@ export default function QuizBuilder({ isDark, onToggleTheme }: PrototypeProps) {
               <Alert variant="info" margin="0 0 medium 0">
                 {accomScope === 'course'
                   ? 'These settings apply to every quiz in this course.'
-                  : 'These settings apply to the current quiz only, including the in-progress attempts.'}
+                  : (
+                    <>
+                      These settings apply to the current quiz only, including the in-progress attempts.{' '}
+                      <Link onClick={() => { setModerateId(null); setScreen('course-accom') }}>
+                        View course accommodations
+                      </Link>
+                    </>
+                  )}
               </Alert>
 
               <View as="div" display="block" margin="0 0 medium 0">
