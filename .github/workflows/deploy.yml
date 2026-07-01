@@ -4,18 +4,16 @@ on:
   push:
     branches: [main]
 
-# Least-privilege permissions for the official Pages deployment flow.
+# Needs write access to push the built site to the gh-pages branch.
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     if: github.repository != 'instructure/instui-sandbox-base'
     runs-on: ubuntu-latest
     steps:
@@ -44,7 +42,7 @@ jobs:
         env:
           BASE_URL: ${{ env.VITE_BASE_URL }}
 
-      - name: Assemble Pages artifact
+      - name: Assemble site
         run: |
           rm -rf _site
           mkdir -p _site
@@ -52,23 +50,20 @@ jobs:
           touch _site/.nojekyll
           if [ "$DEPLOY_DEST" = "." ]; then
             cp -R dist/. _site/
+            # SPA fallback so deep links / refresh don't 404.
+            cp dist/index.html _site/404.html
           else
             mkdir -p "_site/$DEPLOY_DEST"
             cp -R dist/. "_site/$DEPLOY_DEST/"
+            cp dist/index.html "_site/$DEPLOY_DEST/404.html"
             # Blank landing page at the domain root so it doesn't 404.
             printf '<!doctype html><meta charset="utf-8">' > _site/index.html
           fi
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: _site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: gh-pages
+          force_orphan: true
