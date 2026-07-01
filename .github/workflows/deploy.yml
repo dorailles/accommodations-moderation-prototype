@@ -48,17 +48,14 @@ jobs:
         run: |
           rm -rf _site
           mkdir -p _site
-          # .nojekyll stops GitHub from running Jekyll (which would skip files like _assets).
           touch _site/.nojekyll
           if [ "$DEPLOY_DEST" = "." ]; then
             cp -R dist/. _site/
-            # SPA fallback so deep links / refresh don't 404.
             cp dist/index.html _site/404.html
           else
             mkdir -p "_site/$DEPLOY_DEST"
             cp -R dist/. "_site/$DEPLOY_DEST/"
             cp dist/index.html "_site/$DEPLOY_DEST/404.html"
-            # Blank landing page at the domain root so it doesn't 404.
             printf '<!doctype html><meta charset="utf-8">' > _site/index.html
           fi
 
