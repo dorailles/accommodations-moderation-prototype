@@ -773,9 +773,6 @@ export default function QuizBuilder({ isDark, onToggleTheme }: PrototypeProps) {
         <Heading level="h2" variant="titleSection" margin="0">Moderate</Heading>
         <Button renderIcon={<GaugeInstUIIcon />}>SpeedGrader</Button>
       </Flex>
-      <Alert variant="info" hasShadow={false} margin="0 0 small 0">
-        You're moderating <Text weight="bold">{quizTitle}</Text>. Changes affect this quiz only.
-      </Alert>
       <View as="div" display="block" margin="0 0 medium 0">
         <Text color="secondary" size="small">
           Quiz default: {BASE_ATTEMPTS} {BASE_ATTEMPTS === 1 ? 'attempt' : 'attempts'}, {BASE_TIME_LIMIT_MIN}-minute time limit.
@@ -872,7 +869,6 @@ export default function QuizBuilder({ isDark, onToggleTheme }: PrototypeProps) {
                           <Text weight="bold">Course accommodation:</Text>
                           <Flex direction="column" alignItems="end">
                             <Text>None</Text>
-                            <Link>Course level settings</Link>
                           </Flex>
                         </Flex>
                       ) : null}

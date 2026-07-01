@@ -179,7 +179,7 @@ export const INITIAL_EXPORTS: string[] = [
 // The course-level list of quizzes, the first screen before entering the builder.
 // 'biology-1' is the canonical quiz mapped in INITIAL_QUESTIONS; the rest are
 // realistic siblings in the same Biology course.
-export type QuizGroup = 'Assignment quizzes' | 'Practice quizzes'
+export type QuizGroup = 'Assignment quizzes'
 
 export type QuizListItem = {
   id: string
@@ -196,11 +196,9 @@ export const QUIZ_INDEX: QuizListItem[] = [
   { id: 'cell-structure', title: 'Cell Structure and Function', group: 'Assignment quizzes', due: 'Mar 24', points: 30, questions: 12, published: true },
   { id: 'genetics', title: 'Genetics and Heredity', group: 'Assignment quizzes', due: 'Apr 7', points: 25, questions: 10, published: false },
   { id: 'midterm', title: 'Midterm Exam', group: 'Assignment quizzes', due: 'Apr 21', points: 100, questions: 40, published: false },
-  { id: 'photosynthesis', title: 'Photosynthesis Practice', group: 'Practice quizzes', due: 'No due date', points: 0, questions: 8, published: true },
-  { id: 'vocab-ch3', title: 'Vocabulary Check: Chapter 3', group: 'Practice quizzes', due: 'No due date', points: 0, questions: 15, published: true },
 ]
 
-export const QUIZ_GROUPS: QuizGroup[] = ['Assignment quizzes', 'Practice quizzes']
+export const QUIZ_GROUPS: QuizGroup[] = ['Assignment quizzes']
 
 // Course-level (second-layer) navigation shown on the quizzes index, in Canvas order.
 export const COURSE_NAV: string[] = [
