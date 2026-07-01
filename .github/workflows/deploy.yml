@@ -1,0 +1,59 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.repository != 'instructure/instui-sandbox-base'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Resolve deploy config
+        run: |
+          HASH=$(node -e "const fs=require('fs');const m=fs.readFileSync('src/sandbox.config.ts','utf8').match(/sandboxHash\s*=\s*'([^']*)'/);process.stdout.write(m&&m[1]?m[1]:'')")
+          REPO="${{ github.event.repository.name }}"
+          if [ -n "$HASH" ]; then
+            echo "VITE_BASE_URL=/$REPO/$HASH/" >> "$GITHUB_ENV"
+            echo "DEPLOY_DEST=$HASH" >> "$GITHUB_ENV"
+          else
+            echo "VITE_BASE_URL=/$REPO/" >> "$GITHUB_ENV"
+            echo "DEPLOY_DEST=." >> "$GITHUB_ENV"
+          fi
+
+      - run: npm run build
+        env:
+          BASE_URL: ${{ env.VITE_BASE_URL }}
+
+      - run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          # Deploy root files: blank index, 404 for SPA routing, .nojekyll to suppress Jekyll/README
+          mkdir -p dist-root
+          touch dist-root/.nojekyll
+          echo '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>' > dist-root/index.html
+          cp dist/404.html dist-root/404.html
+          npx gh-pages -d dist-root --add --dotfiles
+          # Deploy app to hashed subdirectory (or root if no hash)
+          if [ "$DEPLOY_DEST" = "." ]; then
+            npx gh-pages -d dist --add --dotfiles
+          else
+            npx gh-pages -d dist --dest "$DEPLOY_DEST" --add --dotfiles
+          fi
